@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 from datetime import datetime
 import csv
 import pandas as pd
+from autoMail import mailu
 
 
 driver = webdriver.Chrome()
@@ -73,6 +74,7 @@ def condition():
             df.to_csv("data.csv", index=False)
             print("email sending")
             #email here
+            mailu()
             return
           if last_row['Last Update'] == last_but2['Last Update'] and (last_but2['Check']):
             df.loc[df.index[-1], 'Check'] = True
@@ -88,6 +90,7 @@ def condition():
             df.to_csv("data.csv", index=False)
             print("<1st entry> email sending")
             #email here
+            mailu()
             return
       else:
           print("No data found.")
