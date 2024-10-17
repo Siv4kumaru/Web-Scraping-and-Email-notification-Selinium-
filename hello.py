@@ -10,11 +10,6 @@ import csv
 import pandas as pd
 
 
-RECORD_FILE = 'record_count.txt'
-
-
-
-
 driver = webdriver.Chrome()
 
 driver.get("https://incometaxindia.gov.in/Pages/communications/circulars.aspx")
@@ -68,21 +63,38 @@ def condition():
       df['Last Update'] = pd.to_datetime(df['Last Update'])
       
       # Iterate through the rows and check if "Date of checking" is greater than "Last Update"
-      
-      print(df)
-      if(df.iloc==1):
+
+      if(len(df)>1):
         last_row=df.iloc[-1]
         last_but2=df.iloc[-2]
-        print(last_row)
-        print(last_but2)
-        if last_row['Date of checking'] > last_row['Last Update']:
-          if bool(last_but2['Check']):
-            return
-          if not bool(last_row['Check']):
-            print("check it out bro")
-            df.loc[df.iloc[-1], 'Check'] = True
+        if last_row['Date of checking'] >= last_row['Last Update']:
+          if not (last_row['Check']) and last_row['Last Update'] != last_but2['Last Update']:
+            df.loc[df.index[-1], 'Check'] = True
             df.to_csv("data.csv", index=False)
-            print("now you checked out, email sent")
+            print("email sending")
+            #email here
+            return
+          if last_row['Last Update'] == last_but2['Last Update'] and (last_but2['Check']):
+            df.loc[df.index[-1], 'Check'] = True
+            df.to_csv("data.csv", index=False)
+            print("alredy sent Email")
+            return
+      elif(len(df)==1):
+        print(df)
+        row=df.iloc[0]
+        if row['Date of checking'] >= row['Last Update']:
+          if not (row['Check']):
+            df.loc[df.index[0], 'Check'] = True
+            df.to_csv("data.csv", index=False)
+            print("<1st entry> email sending")
+            #email here
+            return
+      else:
+          print("No data found.")
+    
+    except FileNotFoundError:
+        print("Error: CSV file not found.")
+        
     except Exception as e:
        print(f"conditional Error {e}")
 
