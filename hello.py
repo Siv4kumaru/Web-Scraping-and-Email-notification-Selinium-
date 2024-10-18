@@ -5,10 +5,13 @@
 import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from datetime import datetime
 import csv
+from bs4 import BeautifulSoup 
 import pandas as pd
 from autoMail import mailu
+import time
 
 
 driver = webdriver.Chrome()
@@ -16,10 +19,38 @@ driver = webdriver.Chrome()
 driver.get("https://incometaxindia.gov.in/Pages/communications/circulars.aspx")
 
   # try is for all dynamic 
+titles=[]
 def get_data():
     try:
+        time.sleep(10)
+        newsearch = driver.find_element(By.ID, "ctl00_SPWebPartManager1_g_5dfb7f33_6e2c_4d3e_b244_c2874a376703_txtNumber")
+        newsearch.send_keys("1")
+        newsearch.send_keys(Keys.RETURN)
+        time.sleep(10)
         newTag=driver.find_elements(By.TAG_NAME, "sup")
+        newTag=driver.find_element(By.TAG_NAME, "sup")
+        clickable=driver.find_element(By.CLASS_NAME, "NotificationNumber")
+        clickable.click()
+        
+        
         new=[i.text for i in newTag if(i.text)]
+        for i in newTag:
+          if i.text:
+            sibling_element = driver.execute_script("return arguments[0].previousElementSibling.innerHTML;", i)
+            print(sibling_element)
+            soup=BeautifulSoup(sibling_element, 'html.parser')
+            notification_number = soup.find('span', class_='NotificationNumber').text.strip()
+            guidance_note = soup.get_text(strip=True).split(notification_number)[1].split(soup.find('span', class_='publishDate').text.strip())[0].strip()
+            publish_date = soup.find('span', class_='publishDate').text.strip()
+
+            
+            # Print the resultscls
+            json={"Notification Number:": notification_number,
+            "Guidance Note:": guidance_note,
+            "Publish Date:": publish_date}
+            
+            titles.append(json)
+        
         print(new)
         emptySearch=driver.find_element(By.CLASS_NAME, "act_search_header")
         lastUpdated=driver.find_element(By.CLASS_NAME, "lastupdated")
@@ -30,7 +61,7 @@ def get_data():
         print(f"Date of Checking:{today}")
         print(f"Record:{record}")
         print(f"Last Updated:{datetime_obj}")
-        toCSV(today,record,datetime_obj)
+        #toCSV(today,record,datetime_obj)
     except:
         print("error finding elements")
         return 
@@ -58,7 +89,7 @@ def toCSV(today,number,update):
 def condition():
     try:
       df = pd.read_csv("data.csv")
-      
+      print(df)
       # Convert "Date of checking" and "Last Update" columns to datetime format
       df['Date of checking'] = pd.to_datetime(df['Date of checking'])
       df['Last Update'] = pd.to_datetime(df['Last Update'])
@@ -74,7 +105,7 @@ def condition():
             df.to_csv("data.csv", index=False)
             print("email sending")
             #email here
-            mailu()
+            mailu(titles)
             return
           if last_row['Last Update'] == last_but2['Last Update'] and (last_but2['Check']):
             df.loc[df.index[-1], 'Check'] = True
@@ -90,7 +121,7 @@ def condition():
             df.to_csv("data.csv", index=False)
             print("<1st entry> email sending")
             #email here
-            mailu()
+            mailu(titles)
             return
       else:
           print("No data found.")

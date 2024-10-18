@@ -5,7 +5,9 @@ from email.message import EmailMessage
 import ssl
 
 load_dotenv()
-def mailu():
+def mailu(titles):
+    
+    print(titles)
     email_sender=os.getenv("EMAIL_SENDER")
     email_password=os.getenv("EMAIL_PASSWORD")
     email_receivers=os.getenv("EMAIL_RECEIVER").split(",")
@@ -14,9 +16,10 @@ def mailu():
     body='''
     hello,
     CHECK THE SITE NOW : https://incometaxindia.gov.in/Pages/communications/circulars.aspx
+    {titles}
     regards,
     SIV
-    '''
+    '''.format(titles=titles)
 
     em = EmailMessage()
     em['From']=email_sender
