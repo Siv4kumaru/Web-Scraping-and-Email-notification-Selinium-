@@ -1,5 +1,6 @@
 #https://developer.chrome.com/docs/chromedriver/downloads
 #download the chomr web driver
+#always run on cmd 
 #add the path of chromedriver C:\Program Files (x86)\chromedriver.exe
 #if not working put path variable using service import inside driver
 from selenium import webdriver
