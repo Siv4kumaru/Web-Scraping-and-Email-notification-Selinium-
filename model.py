@@ -12,10 +12,11 @@ Base = declarative_base()
 class Table(Base):
     __tablename__ = 'Table'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    Title= Column(Integer)
+    Title= Column(String)
     Datetime = Column(String)
     Link = Column(String)
     Email_Sent = Column(Boolean)
+    Type= Column(String)
 
 class EMAILSENT(Base):
     __tablename__ = 'email_sent'

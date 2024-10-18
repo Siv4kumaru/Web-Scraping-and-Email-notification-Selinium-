@@ -16,32 +16,51 @@ Session = sessionmaker(bind=engine)
 driver = webdriver.Chrome()
 session = Session()  # Assuming Session is already defined and configured
 driver.get("https://incometaxindia.gov.in/Pages/communications/circulars.aspx")
+driver.execute_script("window.open('https://incometaxindia.gov.in/Pages/communications/notifications.aspx', '_blank');")
+all_tabs = driver.window_handles
+
 file_name="data.csv"
 
   # try is for all dynamic 
 def get_data():
+    driver.switch_to.window(all_tabs[0])
     pageOne=[]
     searchResult=driver.find_elements(By.CLASS_NAME, "search_result")
     for i in searchResult:
       linkArray1=i.find_element(By.TAG_NAME, "a").get_attribute("onclick").split("'")[1]
       link=linkArray1.split(".pdf&")[0]+".pdf"
       arr=i.text.split("\n")[:2]
-      arr.append(link)
       pageOne.append(arr)
+    driver.close()
+    
+
     # dummy=["d","u","mmy"]
     # pageOne.append(dummy)
-    db(pageOne)
+    db(pageOne,"circulars")
+    driver.switch_to.window(all_tabs[1])
+    pagetwo_Noti=[]
+    pagetwo=driver.find_elements(By.CLASS_NAME, "search_result")
+    for i in pagetwo:
+      linkArray1=i.find_element(By.TAG_NAME, "a").get_attribute("onclick").split("'")[1]
+      link=linkArray1.split(".pdf&")[0]+".pdf"
+      arr=i.text.split("\n")[:2]
+      arr.append(link)
+      pagetwo_Noti.append(arr[2])
+    db(pagetwo_Noti,"notifications")
+    driver.quit()
+    
 
   
-def db(pageOne):
-    try:
-        for i in pageOne:
+def db(page,type):
+    # try:
+        for i in page:
             if session.query(Table).filter(Table.Title == i[0]).first() is None:
                 new_entry = Table(
                     Title=i[0],
                     Datetime=i[1],
-                    Link=i[2],
-                    Email_Sent=False
+                    Link=i[2] if len(i)>2 else "not pdf",
+                    Email_Sent=False,
+                    Type=type
                 )
                 print("New entry Added to the database")
                 session.add(new_entry)
@@ -49,15 +68,15 @@ def db(pageOne):
                 print("Already in the database")
         condition()
         session.commit()  # Commit all changes after the loop
-    except Exception as e:
-        session.rollback()  # Rollback in case of error
-        print(f"An error occurred: {e}")
+    # except Exception as e:
+    #     session.rollback()  # Rollback in case of error
+    #     print(f"An error occurred: {e}")
 
 def condition():
     email_list = []
     for i in session.query(Table).filter(Table.Email_Sent == False).all():
         i.Email_Sent = True
-        email_list.append([i.Title,i.Datetime,i.Link])
+        email_list.append([i.Title,i.Datetime,i.Link,i.Type])
         session.commit()
         print("email sent")
     if len(email_list)>0:
@@ -73,6 +92,6 @@ get_data()
 
 
 #driver.close() for tab
-driver.quit()
+
 
 

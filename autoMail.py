@@ -38,7 +38,7 @@ def mailu(listu):
     email_receivers=os.getenv("EMAIL_RECEIVER").split(",")
     print(email_receivers)
 
-
+    return
 
 
     em = EmailMessage()
