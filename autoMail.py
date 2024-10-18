@@ -25,7 +25,6 @@ def mailu(listu):
     '''.format(result=result)
 
     print(body)
-    return
     email_sender=os.getenv("EMAIL_SENDER")
     email_password=os.getenv("EMAIL_PASSWORD")
     email_receivers=os.getenv("EMAIL_RECEIVER").split(",")

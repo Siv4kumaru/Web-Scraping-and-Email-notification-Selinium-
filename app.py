@@ -2,10 +2,8 @@
 #download the chomr web driver
 #add the path of chromedriver C:\Program Files (x86)\chromedriver.exe
 #if not working put path variable using service import inside driver
-import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from sqlalchemy import create_engine
 from autoMail import mailu
 from model import Table
