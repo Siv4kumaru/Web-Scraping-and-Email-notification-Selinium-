@@ -75,7 +75,6 @@ def db(page,type):
                 session.add(new_entry)
             else:
                 print("Already in the database")
-        condition()
         session.commit()  # Commit all changes after the loop
     except Exception as e:
          session.rollback()  # Rollback in case of error
@@ -102,6 +101,7 @@ def condition():
 
 session.close()  # Ensure the session is closed
 get_data()
+condition()
 
   
 
