@@ -10,7 +10,7 @@ Email Received:
   ![image](https://github.com/user-attachments/assets/8395469e-e2f0-4c52-a75a-c3204fbc53b2)
 
 
-This project scrapes data from a https://incometaxindia.gov.in/Pages/communications/notifications.aspx daily, organizes it, and sends email notifications to specified recipients if new entries are detected. It uses Selenium for web scraping and an SMTP server for email notifications.
+This project scrapes data from income tax india site (https://incometaxindia.gov.in/Pages/communications/notifications.aspx) daily, organizes it, and sends email notifications to specified recipients if new entries are detected. It uses Selenium for web scraping and an SMTP server for email notifications.
 Requirements
 
     Python 3.8 or above
